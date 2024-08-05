@@ -136,6 +136,8 @@ extern uint32_t  g_back_color;      /* 背景颜色.默认为白色 */
 #define SSD_VT          (SSD_VER_RESOLUTION + SSD_VER_BACK_PORCH + SSD_VER_FRONT_PORCH)
 #define SSD_VPS         (SSD_VER_BACK_PORCH)
 
+# define FORCE_INLINE __attribute__((always_inline)) inline
+
 /******************************************************************************************/
 /* 函数声明 */
 

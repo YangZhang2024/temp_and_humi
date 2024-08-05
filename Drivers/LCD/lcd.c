@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include "stdlib.h"
 #include "lcd.h"
 #include "lcdfont.h"
@@ -43,7 +44,7 @@ void lcd_wr_xdata(uint16_t data) {
  * @param       regno: 寄存器编号/地址
  * @retval      无
  */
-//__attribute__((always_inline))
+FORCE_INLINE
 void lcd_wr_regno(volatile uint16_t regno) {
     LCD_RS(0);              /* RS=0,表示写寄存器 */
     LCD_CS(0);
@@ -93,9 +94,8 @@ static uint16_t lcd_rd_data(void) {
     LCD_RS(1);              /* RS=1,表示操作数据 */
     LCD_CS(0);
     LCD_RD(0);
-    lcd_opt_delay(2);
-    ram = LCD_DATA_IN;      /* 读取数据 */
     LCD_RD(1);
+    ram = LCD_DATA_IN;      /* 读取数据 */
     LCD_CS(1);
 
     /* LCD_DATA 引脚模式设置, 推挽输出, 恢复输出状态 */
@@ -113,7 +113,7 @@ static uint16_t lcd_rd_data(void) {
  * @param       无
  * @retval      无
  */
-//__attribute__((always_inline))
+FORCE_INLINE
 void lcd_write_ram_prepare(void) {
     lcd_wr_regno(lcddev.wramcmd);
 }
@@ -598,15 +598,28 @@ void lcd_init(void) {
     LCD_RS(1);                  /* RS 默认高电平 */
     LCD_DATA_OUT(0XFFFF);       /* DATA 默认高电平 */
 
-    lcd_opt_delay(0X1FFFF);
+//    lcd_opt_delay(0X1FFFF);
+    delay_ms(100);
+    lcddev.id = 0;
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
 
     /* 尝试9341 ID的读取 */
     lcd_wr_regno(0XD3);
     lcddev.id = lcd_rd_data();  /* dummy read */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
+    delay_ms(100);
+
     lcddev.id = lcd_rd_data();  /* 读到0X00 */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
+    delay_ms(100);
+
     lcddev.id = lcd_rd_data();  /* 读取0X93 */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
+    delay_ms(100);
+
     lcddev.id <<= 8;
     lcddev.id |= lcd_rd_data(); /* 读取0X41 */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
 
     if (lcddev.id != 0X9341)    /* 不是 9341 , 尝试看看是不是 ST7789 */
     {
@@ -687,24 +700,26 @@ void lcd_init(void) {
      * 里面(卡死在f_putc函数), 所以, 必须初始化串口1, 或者屏蔽掉下面
      * 这行 printf 语句 !!!!!!!
      */
-//    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
 
-    if (lcddev.id == 0X7789) {
-        lcd_ex_st7789_reginit();    /* 执行ST7789初始化 */
-    } else if (lcddev.id == 0X9341) {
-        lcd_ex_ili9341_reginit();   /* 执行ILI9341初始化 */
-    } else if (lcddev.id == 0x5310) {
-        lcd_ex_nt35310_reginit();   /* 执行NT35310初始化 */
-    } else if (lcddev.id == 0x7796) {
-        lcd_ex_st7796_reginit();    /* 执行ST7796初始化 */
-    } else if (lcddev.id == 0x5510) {
-        lcd_ex_nt35510_reginit();   /* 执行NT35510初始化 */
-    } else if (lcddev.id == 0x9806) {
-        lcd_ex_ili9806_reginit();   /* 执行ILI9806初始化 */
-    } else if (lcddev.id == 0x1963) {
-        lcd_ex_ssd1963_reginit();   /* 执行SSD1963初始化 */
-        lcd_ssd_backlight_set(100); /* 背光设置为最亮 */
-    }
+//    if (lcddev.id == 0X7789) {
+//        lcd_ex_st7789_reginit();    /* 执行ST7789初始化 */
+//    } else if (lcddev.id == 0X9341) {
+//        lcd_ex_ili9341_reginit();   /* 执行ILI9341初始化 */
+//    } else if (lcddev.id == 0x5310) {
+//        lcd_ex_nt35310_reginit();   /* 执行NT35310初始化 */
+//    } else if (lcddev.id == 0x7796) {
+//        lcd_ex_st7796_reginit();    /* 执行ST7796初始化 */
+//    } else if (lcddev.id == 0x5510) {
+//        lcd_ex_nt35510_reginit();   /* 执行NT35510初始化 */
+//    } else if (lcddev.id == 0x9806) {
+//        lcd_ex_ili9806_reginit();   /* 执行ILI9806初始化 */
+//    } else if (lcddev.id == 0x1963) {
+//        lcd_ex_ssd1963_reginit();   /* 执行SSD1963初始化 */
+//        lcd_ssd_backlight_set(100); /* 背光设置为最亮 */
+//    }
+
+    lcd_ex_ili9341_reginit();
 
     lcd_display_dir(0); /* 默认为竖屏 */
     LCD_BL(1);          /* 点亮背光 */
