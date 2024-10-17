@@ -1120,6 +1120,20 @@ void lcd_show_string(uint16_t x, uint16_t y, uint16_t width, uint16_t height, ui
 }
 
 
+/**
+ * 支持 printf 输出模式, buffer 长度为 64 注意字符串长度
+ */
+void lcd_printf(uint16_t x, uint16_t y, const char *format, ...) {
+    char buffer[64] = {0};
+    va_list args;
+
+    va_start(args, format);
+    vsprintf(buffer, format, args);
+    va_end(args);
+    lcd_show_string(x, y, (lcddev.width - x - 10), lcddev.height - y, 16, buffer, BLUE);
+}
+
+
 
 
 
