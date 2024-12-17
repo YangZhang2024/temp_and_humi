@@ -103,25 +103,27 @@ int main(void) {
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
+    uint8_t measure_success = 0;
     double temp = 0, humidity = 0;
-    while (!get_humidity(&temp, &humidity)) {
+
+    while (!measure_success) {
+        measure_success = get_humidity(&temp, &humidity);
         delay_ms(100);
     }
     lcd_printf(10, 150, "                        ");
-    lcd_printf(10, 170, "Temperature: %.2f 'C", temp);
-    lcd_printf(10, 190, "Humidity   : %.2f RH", humidity);
     while (1) {
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
-        delay_ms(2100);
-        if (get_humidity(&temp, &humidity)) {
+        if (measure_success) {
             lcd_printf(10, 210, "                     ");
             lcd_printf(10, 170, "Temperature: %.2f 'C", temp);
             lcd_printf(10, 190, "Humidity   : %.2f RH", humidity);
         } else {
             lcd_printf(10, 210, "Measurement error");
         }
+        delay_ms(2100);
+        measure_success = get_humidity(&temp, &humidity);
     }
     /* USER CODE END 3 */
 }
