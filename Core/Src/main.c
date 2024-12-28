@@ -124,6 +124,7 @@ int main(void) {
         }
         delay_ms(2100);
         measure_success = get_humidity(&temp, &humidity);
+//        measure_success = get_humidity(&temp, &humidity);
     }
     /* USER CODE END 3 */
 }
